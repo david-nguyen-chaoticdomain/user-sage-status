@@ -223,7 +223,7 @@
       <section>
         <h2>Public uptime and incident status</h2>
         <p class="lede">
-          This status page is the public home for key User Sage services. It is separate from the app repo so deploy safety and status communication can evolve independently.
+           Check real-time availability for key User Sage services, incident updates, and planned maintenance.
         </p>
       </section>
 
@@ -258,7 +258,7 @@
       </section>
 
       <div class="footer">
-        <div>© 2026 User Sage</div>
+        <div>Chaotic Spark, a DBA of Chaotic Domain, LLC &copy; <span id="current-year"></span></div>
         <div class="links">
           <a href="https://usersage.com/privacy">Privacy Policy</a>
           <a href="https://usersage.com/terms">Terms of Service</a>
@@ -269,6 +269,9 @@
 
     <script>
       (function () {
+        const yearEl = document.getElementById('current-year');
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
         const STATUS_API = 'https://usersage.com/api/admin?resource=status';
 
         const DEFAULT_STATE = {
