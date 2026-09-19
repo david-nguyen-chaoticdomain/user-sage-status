@@ -1,21 +1,15 @@
 # User Sage Status
 
-Public uptime and incident status for User Sage.
+Public service status for User Sage.
 
-This repo is the operational home for the public status page and uptime monitoring. It is intentionally separate from the app repo so deploy safety and status communication can evolve independently.
+Visit https://status.usersage.com for live availability, incident updates, and planned maintenance notices.
 
-## Intended use
+## What you can find here
 
-- status page for `status.usersage.com`
-- uptime checks for app, API, auth, and AI endpoints
-- incident timeline and component status
-- deploy safety and downtime communication
+- current service health for core User Sage services
+- active incident notices and updates
+- planned maintenance communication
 
-## Repo split
+## Need help?
 
-- `user-sage-app` handles runtime deploy maintenance mode
-- `user-sage-status` handles public status visibility and monitor setup
-
-## Recommended next step
-
-Use this repo with a hosted status solution or Upptime-style workflow to publish the public status page, then bind the custom domain.
+For account or product support, visit https://usersage.com.
