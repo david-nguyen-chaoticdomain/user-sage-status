@@ -269,76 +269,167 @@
 
     <script>
       (function () {
+        const STATUS_API = 'https://usersage.com/api/admin?resource=status';
+
+        const DEFAULT_STATE = {
+          overallStatus: 'operational',
+          activeNotice: false,
+          noticeTitle: 'All systems operational',
+          noticeMessage: 'There are no active incidents affecting User Sage services at the moment.',
+          updatedAtUtc: null,
+          services: [
+            { key: 'app', label: 'App', status: 'operational' },
+            { key: 'api', label: 'API', status: 'operational' },
+            { key: 'auth', label: 'Auth', status: 'operational' },
+            { key: 'ai', label: 'AI', status: 'operational' },
+          ],
+        };
+
+        function getStatusClass(value) {
+          if (value === 'down') return 'bad';
+          if (value === 'degraded') return 'warn';
+          return 'ok';
+        }
+
+        function titleCase(value) {
+          return String(value || 'operational').charAt(0).toUpperCase() + String(value || 'operational').slice(1);
+        }
+
+        function updateStatusPage(data) {
+          const state = {
+            ...DEFAULT_STATE,
+            ...data,
+            services: Array.isArray(data?.services) && data.services.length ? data.services : DEFAULT_STATE.services,
+          };
+
+          const statusChip = document.querySelector('.status-chip');
+          const updatedEl = document.querySelector('.updated');
+          const incidentTitle = document.querySelector('.incident h3');
+          const incidentBody = document.querySelector('.incident p');
+
+          const displayStatus = state.activeNotice ? state.noticeTitle : 'All systems operational';
+          const displayMessage = state.activeNotice ? state.noticeMessage : 'There are no active incidents affecting User Sage services at the moment.';
+
+          if (statusChip) {
+            statusChip.innerHTML = '<span class="dot"></span>' + displayStatus;
+            statusChip.style.background = state.activeNotice ? 'rgba(199,122,22,0.12)' : 'var(--green-soft)';
+            statusChip.style.color = state.activeNotice ? 'var(--amber)' : 'var(--green)';
+            statusChip.style.borderColor = state.activeNotice ? 'rgba(199,122,22,0.25)' : 'rgba(26, 141, 93, 0.2)';
+            statusChip.querySelector('.dot').style.background = state.activeNotice ? 'var(--amber)' : 'var(--green)';
+            statusChip.querySelector('.dot').style.boxShadow = state.activeNotice
+              ? '0 0 0 5px rgba(199, 122, 22, 0.12)'
+              : '0 0 0 5px rgba(26, 141, 93, 0.12)';
+          }
+
+          if (updatedEl) {
+            const when = state.updatedAtUtc ? new Date(state.updatedAtUtc).toUTCString().replace(' GMT', ' UTC') : 'just now';
+            updatedEl.textContent = 'Updated: ' + when;
+          }
+
+          if (incidentTitle) incidentTitle.textContent = state.activeNotice ? displayStatus : 'No active incidents';
+          if (incidentBody) incidentBody.textContent = state.activeNotice ? displayMessage : 'There are no active incidents affecting User Sage services at the moment. We’ll post updates here during any degradation or outage.';
+
+          document.querySelectorAll('.component .value').forEach((node) => {
+            const label = node.parentElement?.querySelector('.name')?.textContent?.trim();
+            const service = state.services.find((entry) => entry.label === label);
+            if (!service) return;
+            node.className = 'value ' + getStatusClass(service.status);
+            node.textContent = titleCase(service.status);
+          });
+        }
+
+        async function loadStatus() {
+          try {
+            const res = await fetch(STATUS_API, {
+              cache: 'no-store',
+              headers: { Accept: 'application/json' },
+            });
+
+            if (!res.ok) throw new Error('status fetch failed');
+
+            const body = await res.json();
+            if (!body || !body.settings) {
+              throw new Error('status payload missing');
+            }
+
+            updateStatusPage(body.settings);
+          } catch {
+            updateStatusPage(DEFAULT_STATE);
+          }
+        }
+
         const eyeL = document.getElementById('status-eye-l');
         const eyeR = document.getElementById('status-eye-r');
-        if (!eyeL || !eyeR) return;
+        if (eyeL && eyeR) {
+          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+          const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+          const EYE_MAX = 1.1;
+          const EYE_REST_X = 0.28;
+          const EYE_REST_Y = 0;
+          const EYE_LERP = 0.38;
 
-        const EYE_MAX = 1.1;
-        const EYE_REST_X = 0.28;
-        const EYE_REST_Y = 0;
-        const EYE_LERP = 0.38;
+          let curX = EYE_REST_X;
+          let curY = EYE_REST_Y;
+          let tgtX = EYE_REST_X;
+          let tgtY = EYE_REST_Y;
+          let raf = 0;
 
-        let curX = EYE_REST_X;
-        let curY = EYE_REST_Y;
-        let tgtX = EYE_REST_X;
-        let tgtY = EYE_REST_Y;
-        let raf = 0;
-
-        function apply(x, y) {
-          const t = `translate(${x} ${y})`;
-          eyeL.setAttribute('transform', t);
-          eyeR.setAttribute('transform', t);
-        }
-
-        function canTrack() {
-          return finePointer.matches && !reduced.matches;
-        }
-
-        function tick() {
-          raf = 0;
-          curX += (tgtX - curX) * EYE_LERP;
-          curY += (tgtY - curY) * EYE_LERP;
-          if (Math.abs(tgtX - curX) < 0.008 && Math.abs(tgtY - curY) < 0.008) {
-            curX = tgtX;
-            curY = tgtY;
-          } else {
-            raf = requestAnimationFrame(tick);
+          function apply(x, y) {
+            const t = `translate(${x} ${y})`;
+            eyeL.setAttribute('transform', t);
+            eyeR.setAttribute('transform', t);
           }
-          apply(curX, curY);
-        }
 
-        function onPointerMove(event) {
+          function canTrack() {
+            return finePointer.matches && !reduced.matches;
+          }
+
+          function tick() {
+            raf = 0;
+            curX += (tgtX - curX) * EYE_LERP;
+            curY += (tgtY - curY) * EYE_LERP;
+            if (Math.abs(tgtX - curX) < 0.008 && Math.abs(tgtY - curY) < 0.008) {
+              curX = tgtX;
+              curY = tgtY;
+            } else {
+              raf = requestAnimationFrame(tick);
+            }
+            apply(curX, curY);
+          }
+
+          function onPointerMove(event) {
+            if (!canTrack()) return;
+            const rect = document.querySelector('.brand-mark').getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = event.clientX - cx;
+            const dy = event.clientY - cy;
+            const nx = dx / Math.max(rect.width / 2, 1);
+            const ny = dy / Math.max(rect.height / 2, 1);
+            const len = Math.hypot(nx, ny) || 1;
+            const scale = Math.min(1, len);
+            tgtX = (nx / len) * EYE_MAX * scale;
+            tgtY = (ny / len) * EYE_MAX * scale;
+            if (!raf) raf = requestAnimationFrame(tick);
+          }
+
+          function resetEyes() {
+            tgtX = EYE_REST_X;
+            tgtY = EYE_REST_Y;
+            if (!raf) raf = requestAnimationFrame(tick);
+          }
+
+          apply(EYE_REST_X, EYE_REST_Y);
+
           if (!canTrack()) return;
-          const rect = document.querySelector('.brand-mark').getBoundingClientRect();
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          const dx = event.clientX - cx;
-          const dy = event.clientY - cy;
-          const nx = dx / Math.max(rect.width / 2, 1);
-          const ny = dy / Math.max(rect.height / 2, 1);
-          const len = Math.hypot(nx, ny) || 1;
-          const scale = Math.min(1, len);
-          tgtX = (nx / len) * EYE_MAX * scale;
-          tgtY = (ny / len) * EYE_MAX * scale;
-          if (!raf) raf = requestAnimationFrame(tick);
+
+          window.addEventListener('pointermove', onPointerMove, { passive: true });
+          document.documentElement.addEventListener('pointerleave', resetEyes);
+          window.addEventListener('blur', resetEyes);
         }
 
-        function resetEyes() {
-          tgtX = EYE_REST_X;
-          tgtY = EYE_REST_Y;
-          if (!raf) raf = requestAnimationFrame(tick);
-        }
-
-        apply(EYE_REST_X, EYE_REST_Y);
-
-        if (!canTrack()) return;
-
-        window.addEventListener('pointermove', onPointerMove, { passive: true });
-        document.documentElement.addEventListener('pointerleave', resetEyes);
-        window.addEventListener('blur', resetEyes);
+        loadStatus();
       })();
     </script>
   </body>
