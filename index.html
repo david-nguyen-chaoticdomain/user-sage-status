@@ -141,6 +141,12 @@
         border-radius: 16px;
         padding: 18px;
         box-shadow: 0 8px 18px rgba(18, 24, 38, 0.04);
+        overflow: visible;
+      }
+      .name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
       .component .name {
         color: var(--muted);
@@ -148,6 +154,51 @@
         letter-spacing: 0.08em;
         font-size: 0.74rem;
         font-weight: 700;
+      }
+      .help-tip {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: var(--panel-alt);
+        color: var(--blue-dark);
+        font-size: 0.68rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: help;
+      }
+      .help-tip:focus {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+      }
+      .help-tooltip {
+        position: absolute;
+        left: 50%;
+        top: calc(100% + 8px);
+        transform: translateX(-50%);
+        width: min(240px, 70vw);
+        padding: 9px 10px;
+        border-radius: 10px;
+        background: #101827;
+        color: #f3f6ff;
+        font-size: 0.78rem;
+        line-height: 1.4;
+        box-shadow: 0 10px 22px rgba(16, 24, 39, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 160ms ease;
+        z-index: 20;
+      }
+      .help-tip:hover .help-tooltip,
+      .help-tip:focus .help-tooltip,
+      .help-tip:focus-within .help-tooltip {
+        opacity: 1;
+        visibility: visible;
       }
       .component .value {
         margin-top: 12px;
@@ -231,19 +282,43 @@
         <h2>Service health</h2>
         <div class="grid">
           <div class="component">
-            <div class="name">App</div>
+            <div class="name-row">
+              <div class="name">App</div>
+              <span class="help-tip" tabindex="0" aria-label="What App covers">
+                ?
+                <span class="help-tooltip" role="tooltip">The main User Sage web app experience, including your dashboard and study workspace.</span>
+              </span>
+            </div>
             <div class="value ok">Operational</div>
           </div>
           <div class="component">
-            <div class="name">API</div>
+            <div class="name-row">
+              <div class="name">API</div>
+              <span class="help-tip" tabindex="0" aria-label="What API covers">
+                ?
+                <span class="help-tooltip" role="tooltip">Backend API services that power data access, study actions, and status updates.</span>
+              </span>
+            </div>
             <div class="value ok">Operational</div>
           </div>
           <div class="component">
-            <div class="name">Auth</div>
+            <div class="name-row">
+              <div class="name">Auth</div>
+              <span class="help-tip" tabindex="0" aria-label="What Auth covers">
+                ?
+                <span class="help-tooltip" role="tooltip">Sign in, session, and account access services used to authenticate and authorize users.</span>
+              </span>
+            </div>
             <div class="value ok">Operational</div>
           </div>
           <div class="component">
-            <div class="name">AI</div>
+            <div class="name-row">
+              <div class="name">AI</div>
+              <span class="help-tip" tabindex="0" aria-label="What AI covers">
+                ?
+                <span class="help-tooltip" role="tooltip">AI-powered generation and analysis services used for simulations and research outputs.</span>
+              </span>
+            </div>
             <div class="value ok">Operational</div>
           </div>
         </div>
