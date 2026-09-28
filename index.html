@@ -129,85 +129,56 @@
         line-height: 1.6;
         max-width: 980px;
       }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 18px;
-        margin-top: 22px;
-      }
-      .component {
+      .svc-list {
         background: var(--panel);
         border: 1px solid var(--line);
         border-radius: 16px;
-        padding: 18px;
+        margin-top: 22px;
+        overflow: hidden;
         box-shadow: 0 8px 18px rgba(18, 24, 38, 0.04);
-        overflow: visible;
       }
-      .name-row {
+      .svc-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--line);
       }
-      .component .name {
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 0.74rem;
+      .svc-row:last-child { border-bottom: 0; }
+      .svc-name {
         font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
       }
-      .help-tip {
-        position: relative;
+      .svc-desc {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+      .status {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        width: 18px;
-        height: 18px;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 0.92rem;
+        white-space: nowrap;
+      }
+      .status .row-dot {
+        width: 9px;
+        height: 9px;
         border-radius: 50%;
-        border: 1px solid var(--line);
-        background: var(--panel-alt);
-        color: var(--blue-dark);
-        font-size: 0.68rem;
-        font-weight: 800;
-        line-height: 1;
-        cursor: help;
       }
-      .help-tip:focus {
-        outline: 2px solid var(--blue);
-        outline-offset: 2px;
+      .status.ok { color: var(--green); }
+      .status.ok .row-dot { background: var(--green); }
+      .status.warn { color: var(--amber); }
+      .status.warn .row-dot { background: var(--amber); }
+      .status.bad { color: var(--rose); }
+      .status.bad .row-dot { background: var(--rose); }
+      @media (max-width: 640px) {
+        .svc-row { padding: 14px 18px; }
       }
-      .help-tooltip {
-        position: absolute;
-        left: 50%;
-        top: calc(100% + 8px);
-        transform: translateX(-50%);
-        width: min(240px, 70vw);
-        padding: 9px 10px;
-        border-radius: 10px;
-        background: #101827;
-        color: #f3f6ff;
-        font-size: 0.78rem;
-        line-height: 1.4;
-        box-shadow: 0 10px 22px rgba(16, 24, 39, 0.3);
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 160ms ease;
-        z-index: 20;
-      }
-      .help-tip:hover .help-tooltip,
-      .help-tip:focus .help-tooltip,
-      .help-tip:focus-within .help-tooltip {
-        opacity: 1;
-        visibility: visible;
-      }
-      .component .value {
-        margin-top: 12px;
-        font-size: 1.1rem;
-        font-weight: 800;
-      }
-      .component .value.ok { color: var(--green); }
-      .component .value.warn { color: var(--amber); }
-      .component .value.bad { color: var(--rose); }
       .incident {
         background: var(--panel-alt);
         border: 1px solid rgba(30, 99, 214, 0.12);
@@ -280,46 +251,41 @@
 
       <section>
         <h2>Service health</h2>
-        <div class="grid">
-          <div class="component">
-            <div class="name-row">
-              <div class="name">App</div>
-              <span class="help-tip" tabindex="0" aria-label="What App covers">
-                ?
-                <span class="help-tooltip" role="tooltip">The main User Sage web app experience, including your dashboard and study workspace.</span>
-              </span>
+        <div class="svc-list">
+          <div class="svc-row">
+            <div>
+              <div class="svc-name">App</div>
+              <div class="svc-desc">The main web app, including your dashboard and study workspace</div>
             </div>
-            <div class="value ok">Operational</div>
+            <span class="status ok"><span class="row-dot"></span>Operational</span>
           </div>
-          <div class="component">
-            <div class="name-row">
-              <div class="name">API</div>
-              <span class="help-tip" tabindex="0" aria-label="What API covers">
-                ?
-                <span class="help-tooltip" role="tooltip">Backend API services that power data access, study actions, and status updates.</span>
-              </span>
+          <div class="svc-row">
+            <div>
+              <div class="svc-name">API</div>
+              <div class="svc-desc">Backend services powering data access and study actions</div>
             </div>
-            <div class="value ok">Operational</div>
+            <span class="status ok"><span class="row-dot"></span>Operational</span>
           </div>
-          <div class="component">
-            <div class="name-row">
-              <div class="name">Auth</div>
-              <span class="help-tip" tabindex="0" aria-label="What Auth covers">
-                ?
-                <span class="help-tooltip" role="tooltip">Sign in, session, and account access services used to authenticate and authorize users.</span>
-              </span>
+          <div class="svc-row">
+            <div>
+              <div class="svc-name">Auth</div>
+              <div class="svc-desc">Sign-in, sessions, and workspace access</div>
             </div>
-            <div class="value ok">Operational</div>
+            <span class="status ok"><span class="row-dot"></span>Operational</span>
           </div>
-          <div class="component">
-            <div class="name-row">
-              <div class="name">AI</div>
-              <span class="help-tip" tabindex="0" aria-label="What AI covers">
-                ?
-                <span class="help-tooltip" role="tooltip">AI-powered generation and analysis services used for simulations and research outputs.</span>
-              </span>
+          <div class="svc-row">
+            <div>
+              <div class="svc-name">AI</div>
+              <div class="svc-desc">AI-powered generation used for simulations and research outputs</div>
             </div>
-            <div class="value ok">Operational</div>
+            <span class="status ok"><span class="row-dot"></span>Operational</span>
+          </div>
+          <div class="svc-row">
+            <div>
+              <div class="svc-name">MCP</div>
+              <div class="svc-desc">Connector for Claude, Cursor, and Muse to create studies and read results</div>
+            </div>
+            <span class="status ok"><span class="row-dot"></span>Operational</span>
           </div>
         </div>
       </section>
@@ -360,6 +326,7 @@
             { key: 'api', label: 'API', status: 'operational' },
             { key: 'auth', label: 'Auth', status: 'operational' },
             { key: 'ai', label: 'AI', status: 'operational' },
+            { key: 'mcp', label: 'MCP', status: 'operational' },
           ],
         };
 
@@ -407,12 +374,13 @@
           if (incidentTitle) incidentTitle.textContent = state.activeNotice ? displayStatus : 'No active incidents';
           if (incidentBody) incidentBody.textContent = state.activeNotice ? displayMessage : 'There are no active incidents affecting User Sage services at the moment. We’ll post updates here during any degradation or outage.';
 
-          document.querySelectorAll('.component .value').forEach((node) => {
-            const label = node.parentElement?.querySelector('.name')?.textContent?.trim();
+          document.querySelectorAll('.svc-row').forEach((row) => {
+            const label = row.querySelector('.svc-name')?.textContent?.trim();
+            const statusEl = row.querySelector('.status');
             const service = state.services.find((entry) => entry.label === label);
-            if (!service) return;
-            node.className = 'value ' + getStatusClass(service.status);
-            node.textContent = titleCase(service.status);
+            if (!service || !statusEl) return;
+            statusEl.className = 'status ' + getStatusClass(service.status);
+            statusEl.innerHTML = '<span class="row-dot"></span>' + titleCase(service.status);
           });
         }
 
