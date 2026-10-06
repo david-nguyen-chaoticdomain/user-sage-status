@@ -209,7 +209,13 @@
         display: flex;
         gap: 18px;
         flex-wrap: wrap;
-        color: var(--muted);
+      }
+      .links a {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .links a:hover {
+        text-decoration: underline;
       }
       @media (max-width: 640px) {
         .page { padding-top: 32px; }
@@ -299,7 +305,7 @@
       </section>
 
       <div class="footer">
-        <div>Chaotic Spark, a DBA of Chaotic Domain, LLC &copy; <span id="current-year"></span></div>
+        <div>Chaotic Domain, LLC &copy; <span id="current-year"></span></div>
         <div class="links">
           <a href="https://usersage.com/privacy">Privacy Policy</a>
           <a href="https://usersage.com/terms">Terms of Service</a>
